@@ -19,10 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationConfig {
 
     @Autowired
-    private final UserRepository repo;
+    private final UserRepository repository;
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> repo.findByUsername(username)
+        return username -> repository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User '" + username + "' not found"));
     }
 

@@ -23,8 +23,8 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     private int id;
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
     private String username;
     private String password;
     @Enumerated(EnumType.STRING)

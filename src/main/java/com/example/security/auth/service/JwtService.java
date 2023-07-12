@@ -47,7 +47,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(getSingnInKey(), SignatureAlgorithm.HS256)
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -68,13 +68,13 @@ public class JwtService {
     public Claims extractAllClaims(String jwt) {
         return Jwts
                 .parserBuilder()
-                .setSigningKey(getSingnInKey())
+                .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(jwt)
                 .getBody();
     }
 
-    private Key getSingnInKey() {
+    private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

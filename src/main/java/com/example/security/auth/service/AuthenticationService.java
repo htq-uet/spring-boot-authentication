@@ -32,8 +32,8 @@ public class AuthenticationService {
         //log in console
         System.out.println("RegisterRequest: " + request);
         var user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
