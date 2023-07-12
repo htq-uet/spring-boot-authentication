@@ -25,7 +25,9 @@ public class User implements UserDetails {
     private int id;
     private String firstname;
     private String lastname;
+    @Column(unique = true)
     private String username;
+    //password is sha256 hashed
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
