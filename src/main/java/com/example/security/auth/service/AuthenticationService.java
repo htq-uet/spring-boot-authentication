@@ -1,6 +1,8 @@
 package com.example.security.auth.service;
 
-import com.example.UserRepository;
+import com.example.model.Token;
+import com.example.repository.TokenRepository;
+import com.example.repository.UserRepository;
 import com.example.model.Role;
 import com.example.model.User;
 import com.example.security.auth.AuthenticationResponse;
@@ -28,6 +30,10 @@ public class AuthenticationService {
 
     @Autowired
     private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    private final TokenRepository tokenRepository;
+
     public AuthenticationResponse register(RegisterRequest request) {
         //log in console
         System.out.println("RegisterRequest: " + request);
@@ -38,11 +44,36 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
-        userRepository.save(user);
+        var savedUser = userRepository.save(user);
         var jwt = jwtService.generateToken(user);
+        saveUserToken(savedUser, jwt);
         return AuthenticationResponse.builder()
                 .token(jwt)
                 .build();
+    }
+
+    private void saveUserToken(User user, String jwt) {
+        var token = Token.builder()
+                .token(jwt)
+                .user(user)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserToken = tokenRepository.findAllValidTokenByUser(user.getId());
+        if (validUserToken.size() > 0) {
+            validUserToken.forEach(token -> {
+                token.setRevoked(true);
+                token.setExpired(true);
+                tokenRepository.save(token);
+            });
+        }
+        else {
+            System.out.println("No valid token found");
+        }
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -54,13 +85,13 @@ public class AuthenticationService {
         );
         var user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow( () -> new RuntimeException("User not found"));
-        //log in console if user is found, else throw exception
-
-
 
         var jwt = jwtService.generateToken(user);
+        revokeAllUserTokens(user);
+        saveUserToken(user, jwt);
         return AuthenticationResponse.builder()
                 .token(jwt)
                 .build();
     }
+
 }

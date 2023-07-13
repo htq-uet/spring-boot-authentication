@@ -1,6 +1,6 @@
 package com.example.security.auth.config;
 
-import com.example.UserRepository;
+import com.example.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

@@ -10,8 +10,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -24,6 +26,8 @@ public class SecurityConfig {
     @Autowired
     private final AuthenticationProvider authenticationProvider;
 
+    @Autowired
+    private final LogoutHandler logoutHandler;
 
 
 
@@ -37,12 +41,20 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                 )
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/demo").authenticated())
+                        .anyRequest().authenticated())
                 .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionFixation().changeSessionId()
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .addLogoutHandler(logoutHandler)
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            SecurityContextHolder.clearContext();
+                        })
+                );
 
 
 
