@@ -1,5 +1,6 @@
 package com.example.security.auth.request;
 
+import com.example.model.Role;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,4 +18,5 @@ public class RegisterRequest {
     private String username;
     @Size(min = 8, max = 16)
     private String password;
+    private String role;
 }

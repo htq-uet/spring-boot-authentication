@@ -30,4 +30,6 @@ public class ApiExceptionHandler {
     public ErrorMessage accessDenied(AccessDeniedException ex) {
         return new ErrorMessage(403, "no authorization");
     }
+
+
 }
